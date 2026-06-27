@@ -1,26 +1,87 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --font-sans: var(--font-outfit), sans-serif;
+  
+  /* Add custom fade in animation if needed */
+  --animate-fade-in: fadeIn 0.3s ease-out;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
+:root {
+  --foreground-rgb: 255, 255, 255;
+  --background-start-rgb: 2, 6, 23; /* slate-950 */
+  --background-end-rgb: 2, 6, 23;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  color: rgb(var(--foreground-rgb));
+  background: rgb(var(--background-start-rgb));
+  /* CRITICAL: Force body back to top after Google Translate attempts to push it down */
+  top: 0px !important; 
+}
+
+/* 
+ * CRITICAL: Hide the ugly Google Translate banner and iframe 
+ */
+.goog-te-banner-frame,
+.skiptranslate > iframe.skiptranslate,
+#goog-gt-tt {
+  display: none !important;
+}
+
+/* Hide the powered by google text */
+.goog-logo-link {
+  display: none !important;
+}
+
+.goog-te-gadget {
+  color: transparent !important;
+  font-size: 0px !important;
+}
+
+/*
+ * Futuristic Vernacular Combobox Styling
+ */
+.goog-te-combo {
+  background-color: rgba(15, 23, 42, 0.7) !important; /* slate-900 */
+  backdrop-filter: blur(8px) !important;
+  border: 1px solid rgba(99, 102, 241, 0.4) !important; /* indigo-500 */
+  color: #f8fafc !important; /* slate-50 */
+  border-radius: 0.75rem !important; /* xl */
+  padding: 0.5rem 1rem !important;
+  font-family: inherit !important;
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
+  outline: none !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23818cf8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 0.75rem center !important;
+  background-size: 1rem 1rem !important;
+  padding-right: 2.5rem !important;
+}
+
+.goog-te-combo:hover, .goog-te-combo:focus {
+  border-color: rgba(99, 102, 241, 0.8) !important; /* indigo-500 glow */
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.3) !important;
+}
+
+.goog-te-combo option {
+  background-color: #0f172a !important; /* slate-900 */
+  color: #f8fafc !important;
 }

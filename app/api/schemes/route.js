@@ -1,721 +1,409 @@
 import { NextResponse } from "next/server";
 
-// Dynamic 30 schemes database with specific religion and community filters, and official redirect links
-const schemesDB = [
+// ── 30-scheme master database ──────────────────────────────────────────────
+const SCHEMES_DB = [
   {
-    id: 1,
-    title: "Pudhumai Penn Scheme",
-    department: "Department of Social Welfare, Tamil Nadu",
+    id: 1, title: "Pudhumai Penn Scheme",
+    department: "Dept. of Social Welfare, Tamil Nadu",
     benefit: "₹1,000 / month",
-    targetGender: "Female",
-    targetOccupation: "Student",
-    targetState: "Tamil Nadu",
-    minAge: 15,
-    maxAge: 25,
-    incomeLimit: 250000,
-    locationType: null,
-    category: null,
-    requiresDifferentlyAbled: false,
-    requiresWidowed: false,
+    gender: "Female", occupation: "Student", state: "Tamil Nadu",
+    minAge: 15, maxAge: 25, incomeLimit: 250000,
     officialLink: "https://www.pudhumaippenn.tn.gov.in",
-    requiredDocsList: ["College Fee Receipt", "10th/12th Marksheet", "Income Certificate"]
+    requiredDocs: ["College Fee Receipt", "10th/12th Marksheet", "Income Certificate"],
   },
   {
-    id: 2,
-    title: "Tamil Puthalvan Scheme",
-    department: "Department of Social Welfare, Tamil Nadu",
+    id: 2, title: "Tamil Puthalvan Scheme",
+    department: "Dept. of Social Welfare, Tamil Nadu",
     benefit: "₹1,000 / month",
-    targetGender: "Male",
-    targetOccupation: "Student",
-    targetState: "Tamil Nadu",
-    minAge: 15,
-    maxAge: 25,
-    incomeLimit: 250000,
-    locationType: null,
-    category: null,
-    requiresDifferentlyAbled: false,
-    requiresWidowed: false,
+    gender: "Male", occupation: "Student", state: "Tamil Nadu",
+    minAge: 15, maxAge: 25, incomeLimit: 250000,
     officialLink: "https://www.tamilputhalvan.tn.gov.in",
-    requiredDocsList: ["College Fee Receipt", "10th/12th Marksheet", "Income Certificate"]
+    requiredDocs: ["College Fee Receipt", "10th/12th Marksheet", "Income Certificate"],
   },
   {
-    id: 3,
-    title: "PM Kisan Samman Nidhi",
-    department: "Ministry of Agriculture & Farmers Welfare, India",
+    id: 3, title: "PM Kisan Samman Nidhi",
+    department: "Ministry of Agriculture, India",
     benefit: "₹6,000 / year",
-    targetGender: null,
-    targetOccupation: "Farmer",
-    targetState: null,
-    minAge: 18,
-    maxAge: 100,
-    incomeLimit: 300000,
-    locationType: "Rural",
-    category: null,
-    requiresDifferentlyAbled: false,
-    requiresWidowed: false,
+    gender: null, occupation: "Farmer", state: null,
+    minAge: 18, maxAge: 100, incomeLimit: 300000, locationType: "Rural",
     officialLink: "https://pmkisan.gov.in",
-    requiredDocsList: ["Land Patta Records", "Aadhaar Card", "Bank Passbook Copy"]
+    requiredDocs: ["Land Patta Records", "Aadhaar Card", "Bank Passbook"],
   },
   {
-    id: 4,
-    title: "Destitute Widow Pension Scheme",
+    id: 4, title: "Destitute Widow Pension Scheme",
     department: "Revenue Department, Tamil Nadu",
     benefit: "₹1,200 / month",
-    targetGender: "Female",
-    targetOccupation: null,
-    targetState: "Tamil Nadu",
-    minAge: 18,
-    maxAge: 100,
-    incomeLimit: 100000,
-    locationType: null,
-    category: null,
-    requiresDifferentlyAbled: false,
-    requiresWidowed: true,
+    gender: "Female", occupation: null, state: "Tamil Nadu",
+    minAge: 18, maxAge: 100, incomeLimit: 100000, maritalStatus: "Widowed",
     officialLink: "https://tnesevai.tn.gov.in",
-    requiredDocsList: ["Death Certificate of Husband", "Widow Certificate", "Income Certificate"]
+    requiredDocs: ["Death Certificate of Husband", "Widow Certificate", "Income Certificate"],
   },
   {
-    id: 5,
-    title: "Pradhan Mantri Mudra Yojana",
+    id: 5, title: "PM Mudra Yojana (Shishu/Kishore/Tarun)",
     department: "Ministry of Finance, India",
-    benefit: "Collateral-free business loans up to ₹10 Lakhs",
-    targetGender: null,
-    targetOccupation: "Business",
-    targetState: null,
-    minAge: 18,
-    maxAge: 65,
-    incomeLimit: null,
-    locationType: null,
-    category: null,
-    requiresDifferentlyAbled: false,
-    requiresWidowed: false,
+    benefit: "Collateral-free loan up to ₹10 Lakhs",
+    gender: null, occupation: "Business", state: null,
+    minAge: 18, maxAge: 65, incomeLimit: null,
     officialLink: "https://www.mudra.org.in",
-    requiredDocsList: ["Business Proposal Plan", "Proof of Identity", "Address Proof of Enterprise"]
+    requiredDocs: ["Business Plan", "Identity Proof", "Enterprise Address Proof"],
   },
   {
-    id: 6,
-    title: "Pradhan Mantri Awas Yojana (Urban)",
-    department: "Ministry of Housing and Urban Affairs, India",
-    benefit: "Interest subsidy of up to ₹2.67 Lakhs for housing",
-    targetGender: null,
-    targetOccupation: null,
-    targetState: null,
-    minAge: 18,
-    maxAge: 100,
-    incomeLimit: 300000,
-    locationType: "Urban",
-    category: null,
-    requiresDifferentlyAbled: false,
-    requiresWidowed: false,
+    id: 6, title: "Pradhan Mantri Awas Yojana (Urban)",
+    department: "Ministry of Housing, India",
+    benefit: "Interest subsidy up to ₹2.67 Lakhs",
+    gender: null, occupation: null, state: null,
+    minAge: 18, maxAge: 100, incomeLimit: 300000, locationType: "Urban",
     officialLink: "https://pmay-urban.gov.in",
-    requiredDocsList: ["Affidavit of Homelessness", "Aadhaar Card", "Income Certificate"]
+    requiredDocs: ["Affidavit of No Home Ownership", "Aadhaar Card", "Income Certificate"],
   },
   {
-    id: 7,
-    title: "Pradhan Mantri Awas Yojana (Gramin)",
+    id: 7, title: "PM Awas Yojana (Gramin)",
     department: "Ministry of Rural Development, India",
-    benefit: "₹1.2 Lakh financial assistance for house construction",
-    targetGender: null,
-    targetOccupation: null,
-    targetState: null,
-    minAge: 18,
-    maxAge: 100,
-    incomeLimit: 150000,
-    locationType: "Rural",
-    category: null,
-    requiresDifferentlyAbled: false,
-    requiresWidowed: false,
+    benefit: "₹1.2 Lakh for house construction",
+    gender: null, occupation: null, state: null,
+    minAge: 18, maxAge: 100, incomeLimit: 150000, locationType: "Rural",
     officialLink: "https://pmayg.nic.in",
-    requiredDocsList: ["BPL Card copy", "Ration Card", "Aadhaar Card"]
+    requiredDocs: ["BPL Card", "Ration Card", "Aadhaar Card"],
   },
   {
-    id: 8,
-    title: "TNSDC Naan Mudhalvan Skill Training",
-    department: "Tamil Nadu Skill Development Corporation",
-    benefit: "Free professional certification & job placement training",
-    targetGender: null,
-    targetOccupation: "Student",
-    targetState: "Tamil Nadu",
-    minAge: 17,
-    maxAge: 30,
-    incomeLimit: null,
-    locationType: null,
-    category: null,
-    requiresDifferentlyAbled: false,
-    requiresWidowed: false,
+    id: 8, title: "TNSDC Naan Mudhalvan",
+    department: "Tamil Nadu Skill Development Corp.",
+    benefit: "Free professional certifications + job placement",
+    gender: null, occupation: "Student", state: "Tamil Nadu",
+    minAge: 17, maxAge: 30, incomeLimit: null,
     officialLink: "https://www.naanmudhalvan.tn.gov.in",
-    requiredDocsList: ["College ID Card", "Aadhaar Card", "Semester Marksheet"]
+    requiredDocs: ["College ID", "Aadhaar Card", "Semester Marksheet"],
   },
   {
-    id: 9,
-    title: "Indira Gandhi National Widow Pension Scheme",
+    id: 9, title: "Indira Gandhi National Widow Pension",
     department: "Ministry of Rural Development, India",
-    benefit: "₹300 - ₹500 / month pension assistance",
-    targetGender: "Female",
-    targetOccupation: null,
-    targetState: null,
-    minAge: 40,
-    maxAge: 79,
-    incomeLimit: 100000,
-    locationType: null,
-    category: null,
-    requiresDifferentlyAbled: false,
-    requiresWidowed: true,
+    benefit: "₹300–₹500 / month",
+    gender: "Female", occupation: null, state: null,
+    minAge: 40, maxAge: 79, incomeLimit: 100000, maritalStatus: "Widowed",
     officialLink: "https://nsap.nic.in",
-    requiredDocsList: ["Death Certificate of Husband", "BPL Certificate", "Aadhaar Card"]
+    requiredDocs: ["Husband's Death Certificate", "BPL Certificate", "Aadhaar Card"],
   },
   {
-    id: 10,
-    title: "Sukanya Samriddhi Yojana",
-    department: "Ministry of Finance, India",
-    benefit: "Tax-free girl child savings scheme with high interest (8.2%)",
-    targetGender: "Female",
-    targetOccupation: null,
-    targetState: null,
-    minAge: 1,
-    maxAge: 10,
-    incomeLimit: null,
-    locationType: null,
-    category: null,
-    requiresDifferentlyAbled: false,
-    requiresWidowed: false,
-    officialLink: "https://www.indiapost.gov.in",
-    requiredDocsList: ["Birth Certificate of Girl Child", "Aadhaar of Parent/Guardian", "Address Proof"]
-  },
-  {
-    id: 11,
-    title: "PM Vishwakarma Yojana",
-    department: "Ministry of Micro, Small & Medium Enterprises, India",
-    benefit: "₹15,000 digital toolkit incentive & 5% interest business loans",
-    targetGender: null,
-    targetOccupation: "Artisan",
-    targetState: null,
-    minAge: 18,
-    maxAge: 80,
-    incomeLimit: null,
-    locationType: null,
-    category: null,
-    requiresDifferentlyAbled: false,
-    requiresWidowed: false,
-    officialLink: "https://pmvishwakarma.gov.in",
-    requiredDocsList: ["Trade Certificate/Artisan card", "Aadhaar Card", "Bank Account Details"]
-  },
-  {
-    id: 12,
-    title: "Ayushman Bharat PM-JAY",
+    id: 10, title: "Ayushman Bharat PM-JAY",
     department: "National Health Authority, India",
-    benefit: "₹5 Lakhs / year cashless family health insurance",
-    targetGender: null,
-    targetOccupation: null,
-    targetState: null,
-    minAge: 0,
-    maxAge: 120,
-    incomeLimit: 120000,
-    locationType: null,
-    category: null,
-    requiresDifferentlyAbled: false,
-    requiresWidowed: false,
+    benefit: "₹5 Lakhs / year cashless health cover",
+    gender: null, occupation: null, state: null,
+    minAge: 0, maxAge: 120, incomeLimit: 120000,
     officialLink: "https://pmjay.gov.in",
-    requiredDocsList: ["PM-JAY Golden Card / Letter", "Ration Card (Smart Card)", "Aadhaar Card"]
+    requiredDocs: ["PM-JAY Golden Card", "Ration Card", "Aadhaar Card"],
   },
   {
-    id: 13,
-    title: "Chief Minister's Comprehensive Health Insurance",
-    department: "Department of Health & Family Welfare, Tamil Nadu",
-    benefit: "₹5 Lakhs / year cashless hospitalization coverage",
-    targetGender: null,
-    targetOccupation: null,
-    targetState: "Tamil Nadu",
-    minAge: 0,
-    maxAge: 120,
-    incomeLimit: 120000,
-    locationType: null,
-    category: null,
-    requiresDifferentlyAbled: false,
-    requiresWidowed: false,
+    id: 11, title: "CM Comprehensive Health Insurance (TN)",
+    department: "Dept. of Health, Tamil Nadu",
+    benefit: "₹5 Lakhs / year cashless hospitalisation",
+    gender: null, occupation: null, state: "Tamil Nadu",
+    minAge: 0, maxAge: 120, incomeLimit: 120000,
     officialLink: "https://www.cmchistn.com",
-    requiredDocsList: ["Income Certificate (< ₹1.2L)", "Ration Card (Smart Card)", "Aadhaar Card"]
+    requiredDocs: ["Income Certificate <₹1.2L", "Smart Ration Card", "Aadhaar Card"],
   },
   {
-    id: 14,
-    title: "Stand-Up India Scheme",
+    id: 12, title: "PM Vishwakarma Yojana",
+    department: "Ministry of MSME, India",
+    benefit: "₹15,000 toolkit + 5% business loans",
+    gender: null, occupation: "Artisan", state: null,
+    minAge: 18, maxAge: 80, incomeLimit: null,
+    officialLink: "https://pmvishwakarma.gov.in",
+    requiredDocs: ["Artisan Certificate", "Aadhaar Card", "Bank Details"],
+  },
+  {
+    id: 13, title: "Stand-Up India",
     department: "Ministry of Finance, India",
-    benefit: "Business loans up to ₹1 Crore for women or SC/ST entrepreneurs",
-    targetGender: "Female",
-    targetOccupation: "Business",
-    targetState: null,
-    minAge: 18,
-    maxAge: 70,
-    incomeLimit: null,
-    locationType: null,
+    benefit: "Loans up to ₹1 Crore for SC/ST/Women entrepreneurs",
+    gender: "Female", occupation: "Business", state: null,
+    minAge: 18, maxAge: 70, incomeLimit: null,
     targetCommunity: ["SC", "ST"],
-    requiresDifferentlyAbled: false,
-    requiresWidowed: false,
     officialLink: "https://www.standupmitra.in",
-    requiredDocsList: ["Caste Certificate", "Company Registration Proof", "Project Estimate Report"]
+    requiredDocs: ["Caste Certificate", "Company Registration", "Project Estimate"],
   },
   {
-    id: 15,
-    title: "PM Matru Vandana Yojana",
-    department: "Ministry of Women & Child Development, India",
-    benefit: "₹5,000 pregnancy financial support in bank account",
-    targetGender: "Female",
-    targetOccupation: null,
-    targetState: null,
-    minAge: 19,
-    maxAge: 45,
-    incomeLimit: 800000,
-    locationType: null,
-    category: null,
-    requiresDifferentlyAbled: false,
-    requiresWidowed: false,
+    id: 14, title: "PM Matru Vandana Yojana",
+    department: "Ministry of Women & Child Development",
+    benefit: "₹5,000 pregnancy support",
+    gender: "Female", occupation: null, state: null,
+    minAge: 19, maxAge: 45, incomeLimit: 800000, maritalStatus: "Married",
     officialLink: "https://wcd.nic.in",
-    requiredDocsList: ["Mother-Child Protection Card (MCP)", "Aadhaar of Mother", "Bank Passbook Copy"]
+    requiredDocs: ["MCP Card", "Aadhaar", "Bank Passbook"],
   },
   {
-    id: 16,
-    title: "Dr. Muthulakshmi Reddy Maternity Benefit",
-    department: "Department of Health, Tamil Nadu",
-    benefit: "₹18,000 cash assistance for pregnant mothers",
-    targetGender: "Female",
-    targetOccupation: null,
-    targetState: "Tamil Nadu",
-    minAge: 19,
-    maxAge: 45,
-    incomeLimit: 200000,
-    locationType: null,
-    category: null,
-    requiresDifferentlyAbled: false,
-    requiresWidowed: false,
+    id: 15, title: "Dr. Muthulakshmi Maternity Benefit (TN)",
+    department: "Dept. of Health, Tamil Nadu",
+    benefit: "₹18,000 cash to pregnant mothers",
+    gender: "Female", occupation: null, state: "Tamil Nadu",
+    minAge: 19, maxAge: 45, incomeLimit: 200000,
     officialLink: "https://picme.tn.gov.in",
-    requiredDocsList: ["Pregnancy Registration Certificate", "ANC Checkup Cards", "Aadhaar Card"]
+    requiredDocs: ["Pregnancy Registration", "ANC Cards", "Aadhaar"],
   },
   {
-    id: 17,
-    title: "Mahila Samman Savings Certificate",
-    department: "Ministry of Finance, India",
-    benefit: "High-yield 7.5% secure deposit interest for women",
-    targetGender: "Female",
-    targetOccupation: null,
-    targetState: null,
-    minAge: 18,
-    maxAge: 100,
-    incomeLimit: null,
-    locationType: null,
-    category: null,
-    requiresDifferentlyAbled: false,
-    requiresWidowed: false,
-    officialLink: "https://www.indiapost.gov.in",
-    requiredDocsList: ["Savings Application Form", "Aadhaar Card", "PAN Card"]
-  },
-  {
-    id: 18,
-    title: "UYEGP Scheme",
-    department: "Department of Industries & Commerce, Tamil Nadu",
-    benefit: "Up to 25% project capital subsidy (up to ₹1.25 Lakhs) for new business",
-    targetGender: null,
-    targetOccupation: "Unemployed",
-    targetState: "Tamil Nadu",
-    minAge: 18,
-    maxAge: 35,
-    incomeLimit: 150000,
-    locationType: null,
-    category: null,
-    requiresDifferentlyAbled: false,
-    requiresWidowed: false,
+    id: 16, title: "UYEGP Scheme (TN)",
+    department: "Dept. of Industries & Commerce, TN",
+    benefit: "25% subsidy up to ₹1.25 Lakhs for new enterprise",
+    gender: null, occupation: "Unemployed", state: "Tamil Nadu",
+    minAge: 18, maxAge: 35, incomeLimit: 150000,
     officialLink: "https://www.msmeonline.tn.gov.in",
-    requiredDocsList: ["Project Quotations", "Transfer Certificate (Marksheet)", "Income Certificate"]
+    requiredDocs: ["Project Quotations", "TC/Marksheet", "Income Certificate"],
   },
   {
-    id: 19,
-    title: "NEEDS Scheme",
-    department: "Department of Industries & Commerce, Tamil Nadu",
-    benefit: "25% state subsidy on investments up to ₹75 Lakhs for graduates",
-    targetGender: null,
-    targetOccupation: "Unemployed",
-    targetState: "Tamil Nadu",
-    minAge: 21,
-    maxAge: 45,
-    incomeLimit: null,
-    locationType: null,
-    category: null,
-    requiresDifferentlyAbled: false,
-    requiresWidowed: false,
-    officialLink: "https://www.msmeonline.tn.gov.in",
-    requiredDocsList: ["Degree Certificate", "Detailed Project Report (DPR)", "Partnership Deed/Rent Proof"]
-  },
-  {
-    id: 20,
-    title: "PM Kaushal Vikas Yojana",
-    department: "Ministry of Skill Development & Entrepreneurship, India",
-    benefit: "Free vocational training & skill certifications",
-    targetGender: null,
-    targetOccupation: "Unemployed",
-    targetState: null,
-    minAge: 15,
-    maxAge: 45,
-    incomeLimit: null,
-    locationType: null,
-    category: null,
-    requiresDifferentlyAbled: false,
-    requiresWidowed: false,
+    id: 17, title: "PM Kaushal Vikas Yojana 4.0",
+    department: "Ministry of Skill Development, India",
+    benefit: "Free vocational training + certification",
+    gender: null, occupation: "Unemployed", state: null,
+    minAge: 15, maxAge: 45, incomeLimit: null,
     officialLink: "https://www.pmkvyofficial.org",
-    requiredDocsList: ["Educational Certificates", "Aadhaar Card", "Bank Account Copy"]
+    requiredDocs: ["Educational Certificates", "Aadhaar", "Bank Account"],
   },
   {
-    id: 21,
-    title: "DDU-GKY Training Scheme",
-    department: "Ministry of Rural Development, India",
-    benefit: "Free skill-based courses and placements for rural youth",
-    targetGender: null,
-    targetOccupation: "Unemployed",
-    targetState: null,
-    minAge: 15,
-    maxAge: 35,
-    incomeLimit: null,
-    locationType: "Rural",
-    category: null,
-    requiresDifferentlyAbled: false,
-    requiresWidowed: false,
-    officialLink: "http://ddugky.gov.in",
-    requiredDocsList: ["BPL Card copy", "Proof of Rural Address", "Aadhaar Card"]
-  },
-  {
-    id: 22,
-    title: "MGNREGA Rural Employment Guarantee",
-    department: "Ministry of Rural Development, India",
-    benefit: "100 days of guaranteed wage employment at local worksites",
-    targetGender: null,
-    targetOccupation: null,
-    targetState: null,
-    minAge: 18,
-    maxAge: 100,
-    incomeLimit: null,
-    locationType: "Rural",
-    category: null,
-    requiresDifferentlyAbled: false,
-    requiresWidowed: false,
-    officialLink: "https://nrega.nic.in",
-    requiredDocsList: ["MGNREGA Job Card Application", "Aadhaar Card", "Local Residence Verification"]
-  },
-  {
-    id: 23,
-    title: "Dr. Ambedkar Post-Matric Scholarship",
-    department: "Ministry of Social Justice and Empowerment, India",
-    benefit: "100% tuition reimbursement and maintenance allowances for student candidates",
-    targetGender: null,
-    targetOccupation: "Student",
-    targetState: null,
-    minAge: 16,
-    maxAge: 30,
-    incomeLimit: 250000,
-    locationType: null,
-    targetCommunity: ["SC", "ST", "BC", "MBC", "DNC"],
-    requiresDifferentlyAbled: false,
-    requiresWidowed: false,
-    officialLink: "https://scholarships.gov.in",
-    requiredDocsList: ["College Fee Invoice", "Caste Certificate", "Income Certificate"]
-  },
-  {
-    id: 24,
-    title: "PM Shram Yogi Maan-dhan",
-    department: "Ministry of Labour & Employment, India",
-    benefit: "₹3,000 monthly pension for unorganized sector workers post age 60",
-    targetGender: null,
-    targetOccupation: "Employed",
-    targetState: null,
-    minAge: 18,
-    maxAge: 40,
-    incomeLimit: 180000,
-    locationType: null,
-    category: null,
-    requiresDifferentlyAbled: false,
-    requiresWidowed: false,
-    officialLink: "https://maandhan.in",
-    requiredDocsList: ["Unorganized Worker Declaration", "Aadhaar Card", "Savings Bank details"]
-  },
-  {
-    id: 25,
-    title: "PM SVANidhi",
-    department: "Ministry of Housing and Urban Affairs, India",
-    benefit: "₹10,000 starting collateral-free working capital loan",
-    targetGender: null,
-    targetOccupation: "Street Vendor",
-    targetState: null,
-    minAge: 18,
-    maxAge: 100,
-    incomeLimit: null,
-    locationType: "Urban",
-    category: null,
-    requiresDifferentlyAbled: false,
-    requiresWidowed: false,
+    id: 18, title: "PM SVANidhi",
+    department: "Ministry of Housing and Urban Affairs",
+    benefit: "₹10,000 working capital micro-loan",
+    gender: null, occupation: "Street Vendor", state: null,
+    minAge: 18, maxAge: 100, incomeLimit: null, locationType: "Urban",
     officialLink: "https://pmsvanidhi.mohua.gov.in",
-    requiredDocsList: ["Vending Certificate (LoR)", "Identity Card of Vendor", "Aadhaar Card"]
+    requiredDocs: ["Vending Certificate", "Vendor ID", "Aadhaar"],
   },
   {
-    id: 26,
-    title: "Indira Gandhi National Old Age Pension Scheme",
-    department: "Ministry of Rural Development, India",
-    benefit: "Monthly social security pension for senior citizens",
-    targetGender: null,
-    targetOccupation: null,
-    targetState: null,
-    minAge: 60,
-    maxAge: 120,
-    incomeLimit: 100000,
-    locationType: null,
-    category: null,
-    requiresDifferentlyAbled: false,
-    requiresWidowed: false,
-    officialLink: "https://nsap.nic.in",
-    requiredDocsList: ["Age Proof Certificate", "BPL Certificate", "Aadhaar Card"]
-  },
-  {
-    id: 27,
-    title: "Indira Gandhi National Disability Pension Scheme",
-    department: "Ministry of Rural Development, India",
-    benefit: "Monthly pension for disabled citizens under poverty line",
-    targetGender: null,
-    targetOccupation: null,
-    targetState: null,
-    minAge: 18,
-    maxAge: 100,
-    incomeLimit: 100000,
-    locationType: null,
-    category: null,
-    requiresDifferentlyAbled: true,
-    requiresWidowed: false,
-    officialLink: "https://nsap.nic.in",
-    requiredDocsList: ["Disability Certificate (40%+)", "Income Proof / BPL Card", "Aadhaar Card"]
-  },
-  {
-    id: 28,
-    title: "CM Girl Child Protection Scheme",
-    department: "Department of Social Welfare, Tamil Nadu",
-    benefit: "₹50,000 fixed deposit in the name of girl child",
-    targetGender: "Female",
-    targetOccupation: null,
-    targetState: "Tamil Nadu",
-    minAge: 0,
-    maxAge: 3,
-    incomeLimit: 72000,
-    locationType: null,
-    category: null,
-    requiresDifferentlyAbled: false,
-    requiresWidowed: false,
-    officialLink: "https://tnesevai.tn.gov.in",
-    requiredDocsList: ["Birth Certificate of Child", "Sterilization Certificate of Parents", "Income Proof"]
-  },
-  {
-    id: 29,
-    title: "TAHDCO Loan Subsidies",
-    department: "Tamil Nadu Adi Dravidar Housing & Development Corporation",
-    benefit: "30% capital assets subsidy for entrepreneurial project financing",
-    targetGender: null,
-    targetOccupation: null,
-    targetState: "Tamil Nadu",
-    minAge: 18,
-    maxAge: 65,
-    incomeLimit: 250000,
-    locationType: null,
-    targetCommunity: ["SC", "ST"],
-    requiresDifferentlyAbled: false,
-    requiresWidowed: false,
-    officialLink: "https://tahdco.tn.gov.in",
-    requiredDocsList: ["Community Certificate (SC/ST)", "Project Cost Breakdown", "Income Certificate"]
-  },
-  {
-    id: 30,
-    title: "Pre-Matric Scholarship for Minorities",
-    department: "Ministry of Minority Affairs, India",
-    benefit: "Full school tuition waiver and stipend for school education",
-    targetGender: null,
-    targetOccupation: "Student",
-    targetState: null,
-    minAge: 6,
-    maxAge: 16,
-    incomeLimit: 100000,
-    locationType: null,
-    targetReligion: ["Muslim", "Christian", "Sikh", "Buddhist", "Jain"],
-    requiresDifferentlyAbled: false,
-    requiresWidowed: false,
+    id: 19, title: "Dr. Ambedkar Post-Matric Scholarship",
+    department: "Ministry of Social Justice, India",
+    benefit: "100% tuition + maintenance allowance",
+    gender: null, occupation: "Student", state: null,
+    minAge: 16, maxAge: 30, incomeLimit: 250000,
+    targetCommunity: ["SC", "ST", "BC", "MBC", "DNC"],
     officialLink: "https://scholarships.gov.in",
-    requiredDocsList: ["Self Declaration of Minority Community", "Previous Class Marksheet", "Income Certificate"]
-  }
+    requiredDocs: ["College Invoice", "Caste Certificate", "Income Certificate"],
+  },
+  {
+    id: 20, title: "TAHDCO Subsidy Loans",
+    department: "Tamil Nadu Adi Dravidar Housing & Dev Corp",
+    benefit: "30% capital subsidy for entrepreneurship",
+    gender: null, occupation: null, state: "Tamil Nadu",
+    minAge: 18, maxAge: 65, incomeLimit: 250000,
+    targetCommunity: ["SC", "ST"],
+    officialLink: "https://tahdco.tn.gov.in",
+    requiredDocs: ["SC/ST Certificate", "Project Cost Plan", "Income Certificate"],
+  },
+  {
+    id: 21, title: "Pre-Matric Scholarship for Minorities",
+    department: "Ministry of Minority Affairs, India",
+    benefit: "Full school fee waiver + monthly stipend",
+    gender: null, occupation: "Student", state: null,
+    minAge: 6, maxAge: 16, incomeLimit: 100000,
+    targetReligion: ["Muslim", "Christian", "Sikh", "Buddhist", "Jain"],
+    officialLink: "https://scholarships.gov.in",
+    requiredDocs: ["Minority Declaration", "Previous Marksheet", "Income Certificate"],
+  },
+  {
+    id: 22, title: "MGNREGA Employment Guarantee",
+    department: "Ministry of Rural Development, India",
+    benefit: "100 days guaranteed wage employment",
+    gender: null, occupation: null, state: null,
+    minAge: 18, maxAge: 100, incomeLimit: null, locationType: "Rural",
+    officialLink: "https://nrega.nic.in",
+    requiredDocs: ["Job Card Application", "Aadhaar", "Local Residence Verification"],
+  },
+  {
+    id: 23, title: "Mahila Samman Savings Certificate",
+    department: "Ministry of Finance, India",
+    benefit: "7.5% tax-free deposit interest for women",
+    gender: "Female", occupation: null, state: null,
+    minAge: 18, maxAge: 100, incomeLimit: null,
+    officialLink: "https://www.indiapost.gov.in",
+    requiredDocs: ["Savings Application Form", "Aadhaar", "PAN Card"],
+  },
+  {
+    id: 24, title: "Indira Gandhi National Disability Pension",
+    department: "Ministry of Rural Development, India",
+    benefit: "Monthly pension for disabled BPL citizens",
+    gender: null, occupation: null, state: null,
+    minAge: 18, maxAge: 100, incomeLimit: 100000, differentlyAbled: true,
+    officialLink: "https://nsap.nic.in",
+    requiredDocs: ["Disability Certificate 40%+", "Income/BPL Proof", "Aadhaar"],
+  },
+  {
+    id: 25, title: "PM Shram Yogi Maan-dhan",
+    department: "Ministry of Labour & Employment, India",
+    benefit: "₹3,000 / month pension after age 60",
+    gender: null, occupation: "Employed", state: null,
+    minAge: 18, maxAge: 40, incomeLimit: 180000,
+    officialLink: "https://maandhan.in",
+    requiredDocs: ["Unorganised Worker Declaration", "Aadhaar", "Bank Details"],
+  },
+  {
+    id: 26, title: "DDU-GKY Rural Skill Training",
+    department: "Ministry of Rural Development, India",
+    benefit: "Free skill courses + placement guarantee",
+    gender: null, occupation: "Unemployed", state: null,
+    minAge: 15, maxAge: 35, incomeLimit: null, locationType: "Rural",
+    officialLink: "http://ddugky.gov.in",
+    requiredDocs: ["BPL Card", "Rural Address Proof", "Aadhaar"],
+  },
+  {
+    id: 27, title: "Sukanya Samriddhi Yojana",
+    department: "Ministry of Finance, India",
+    benefit: "8.2% p.a. tax-free savings for girl child",
+    gender: "Female", occupation: null, state: null,
+    minAge: 1, maxAge: 10, incomeLimit: null,
+    officialLink: "https://www.indiapost.gov.in",
+    requiredDocs: ["Girl Child Birth Certificate", "Parent Aadhaar", "Address Proof"],
+  },
+  {
+    id: 28, title: "Indira Gandhi Old Age Pension",
+    department: "Ministry of Rural Development, India",
+    benefit: "Monthly social security pension",
+    gender: null, occupation: null, state: null,
+    minAge: 60, maxAge: 120, incomeLimit: 100000,
+    officialLink: "https://nsap.nic.in",
+    requiredDocs: ["Age Certificate", "BPL Certificate", "Aadhaar"],
+  },
+  {
+    id: 29, title: "NEEDS Scheme (TN Graduates)",
+    department: "Dept. of Industries & Commerce, TN",
+    benefit: "25% state subsidy up to ₹75 Lakhs for graduates",
+    gender: null, occupation: "Unemployed", state: "Tamil Nadu",
+    minAge: 21, maxAge: 45, incomeLimit: null,
+    officialLink: "https://www.msmeonline.tn.gov.in",
+    requiredDocs: ["Degree Certificate", "Detailed Project Report", "Partnership Deed"],
+  },
+  {
+    id: 30, title: "CM Girl Child Protection Scheme (TN)",
+    department: "Dept. of Social Welfare, Tamil Nadu",
+    benefit: "₹50,000 fixed deposit for girl child",
+    gender: "Female", occupation: null, state: "Tamil Nadu",
+    minAge: 0, maxAge: 3, incomeLimit: 72000,
+    officialLink: "https://tnesevai.tn.gov.in",
+    requiredDocs: ["Birth Certificate", "Sterilisation Certificate", "Income Proof"],
+  },
 ];
 
-// Helper to clamp matching percentages within bounds [0, 100]
-function clampScore(score) {
-  return Math.max(0, Math.min(100, Math.round(score)));
+// ── Scoring helpers ────────────────────────────────────────────────────────
+function clamp(n) { return Math.max(0, Math.min(100, Math.round(n))); }
+
+function score(scheme, u) {
+  let pct = 100;
+  const matched = [];
+  const missing = [];
+
+  // Gender
+  if (scheme.gender) {
+    if (u.gender === scheme.gender) matched.push(`Gender requirement met (${scheme.gender})`);
+    else { pct -= 40; missing.push(`Gender target mismatch — requires ${scheme.gender}`); }
+  }
+
+  // Age
+  if (scheme.minAge != null && u.age < scheme.minAge) {
+    pct -= 30;
+    missing.push(`Below minimum age (requires ≥ ${scheme.minAge} yrs)`);
+  } else if (scheme.maxAge != null && u.age > scheme.maxAge) {
+    pct -= 30;
+    missing.push(`Exceeds maximum age (limit: ${scheme.maxAge} yrs)`);
+  } else if (scheme.minAge != null || scheme.maxAge != null) {
+    matched.push(`Age eligibility verified (${u.age} yrs)`);
+  }
+
+  // State
+  if (scheme.state) {
+    if (u.state === scheme.state) matched.push(`State residency verified (${scheme.state})`);
+    else { pct -= 40; missing.push(`Domicile state mismatch — requires ${scheme.state}`); }
+  }
+
+  // Income
+  if (scheme.incomeLimit != null) {
+    if (u.income > scheme.incomeLimit) {
+      pct -= 35;
+      missing.push(`Income exceeds ceiling (₹${scheme.incomeLimit.toLocaleString("en-IN")})`);
+    } else {
+      matched.push(`Income under ceiling (< ₹${scheme.incomeLimit.toLocaleString("en-IN")})`);
+    }
+  }
+
+  // Location
+  if (scheme.locationType) {
+    if (u.locationType === scheme.locationType) matched.push(`Geographical eligibility met (${scheme.locationType})`);
+    else { pct -= 25; missing.push(`Requires ${scheme.locationType} sector residence`); }
+  }
+
+  // Occupation
+  if (scheme.occupation) {
+    if (u.occupation === scheme.occupation) matched.push(`Occupation matched: ${scheme.occupation}`);
+    else { pct -= 35; missing.push(`Requires occupation: ${scheme.occupation}`); }
+  }
+
+  // Marital status
+  if (scheme.maritalStatus) {
+    if (u.maritalStatus === scheme.maritalStatus) matched.push(`Marital status verified (${scheme.maritalStatus})`);
+    else { pct -= 45; missing.push(`Requires marital status: ${scheme.maritalStatus}`); }
+  }
+
+  // Disability
+  if (scheme.differentlyAbled) {
+    if (u.differentlyAbled) matched.push("Disability criteria met (PwD)");
+    else { pct -= 50; missing.push("Requires official Disability Certificate (PwD ≥ 40%)"); }
+  }
+
+  // Community
+  if (scheme.targetCommunity) {
+    if (scheme.targetCommunity.includes(u.community)) matched.push(`Community eligibility met (${u.community})`);
+    else { pct -= 40; missing.push(`Requires community: [${scheme.targetCommunity.join(", ")}]`); }
+  }
+
+  // Religion
+  if (scheme.targetReligion) {
+    if (scheme.targetReligion.includes(u.religion)) matched.push(`Minority religion criteria met (${u.religion})`);
+    else { pct -= 50; missing.push(`Requires minority religion: [${scheme.targetReligion.join(", ")}]`); }
+  }
+
+  // Bonus boosts
+  if (u.occupation === "Student" && scheme.title.toLowerCase().includes("scholarship")) pct += 8;
+  if (u.occupation === "Student" && scheme.title.toLowerCase().includes("skill"))       pct += 4;
+  if (u.occupation === "Farmer"  && scheme.title.toLowerCase().includes("kisan"))       pct += 8;
+
+  const final = clamp(pct);
+  return {
+    id: scheme.id,
+    title: scheme.title,
+    department: scheme.department,
+    benefit: scheme.benefit,
+    officialLink: scheme.officialLink,
+    matchPercentage: final,
+    matchedCriteria: matched.length ? matched : ["General citizen criteria verified"],
+    missingDocuments: final === 100 ? [] : missing,
+    requiredDocsList: scheme.requiredDocs || ["Aadhaar Card"],
+  };
 }
 
+// ── POST handler ───────────────────────────────────────────────────────────
 export async function POST(request) {
   try {
     const body = await request.json();
 
-    const userProfile = {
-      name: body.name || "Citizen",
-      age: Number(body.age) || 0,
-      gender: body.gender || "Female",
-      state: body.state || "Tamil Nadu",
-      income: Number(body.income) || 0,
-      occupation: body.occupation || "Student",
-      maritalStatus: body.maritalStatus || "Single",
-      locationType: body.locationType || "Urban",
-      category: body.category || "General",
+    const user = {
+      name:            body.name          || "Citizen",
+      age:             Number(body.age)   || 0,
+      gender:          body.gender        || "Female",
+      state:           body.state         || "Tamil Nadu",
+      income:          Number(body.income)|| 0,
+      occupation:      body.occupation    || "Student",
+      maritalStatus:   body.maritalStatus || "Single",
+      locationType:    body.locationType  || "Urban",
       differentlyAbled: Boolean(body.differentlyAbled),
-      religion: body.religion || "Hindu",
-      community: body.community || "General"
+      religion:        body.religion      || "Hindu",
+      community:       body.community     || "General",
     };
 
-    const calculatedSchemes = schemesDB.map((scheme) => {
-      let matchPercentage = 100;
-      const matchedCriteria = [];
-      const missingDocuments = [];
-
-      // 1. Gender Verification
-      if (scheme.targetGender) {
-        if (userProfile.gender !== scheme.targetGender) {
-          matchPercentage -= 40;
-          missingDocuments.push(`Gender target mismatch (Requires: ${scheme.targetGender})`);
-        } else {
-          matchedCriteria.push(`Gender requirement met (${scheme.targetGender})`);
-        }
-      }
-
-      // 2. Age Restrictions
-      if (scheme.minAge !== null || scheme.maxAge !== null) {
-        if (scheme.minAge !== null && userProfile.age < scheme.minAge) {
-          matchPercentage -= 30;
-          missingDocuments.push(`Below minimum age criteria (Requires: ${scheme.minAge} years)`);
-        } else if (scheme.maxAge !== null && userProfile.age > scheme.maxAge) {
-          matchPercentage -= 30;
-          missingDocuments.push(`Exceeds maximum age limit (Limit: ${scheme.maxAge} years)`);
-        } else {
-          matchedCriteria.push(`Age eligibility verified (${userProfile.age} yrs)`);
-        }
-      }
-
-      // 3. State/Residence Residency Proofs
-      if (scheme.targetState) {
-        if (userProfile.state !== scheme.targetState) {
-          matchPercentage -= 40;
-          missingDocuments.push(`Domicile state mismatch (Requires: ${scheme.targetState})`);
-        } else {
-          matchedCriteria.push(`State residency verified (${scheme.targetState})`);
-        }
-      }
-
-      // 4. Annual Income Restrictions
-      if (scheme.incomeLimit !== null) {
-        if (userProfile.income > scheme.incomeLimit) {
-          matchPercentage -= 35;
-          missingDocuments.push(`Income exceeds eligibility cap (Limit: ₹${scheme.incomeLimit.toLocaleString('en-IN')})`);
-        } else {
-          matchedCriteria.push(`Annual income under ceiling (< ₹${scheme.incomeLimit.toLocaleString('en-IN')})`);
-        }
-      }
-
-      // 5. Area / Location Type
-      if (scheme.locationType) {
-        if (userProfile.locationType !== scheme.locationType) {
-          matchPercentage -= 25;
-          missingDocuments.push(`Requires residence in a ${scheme.locationType} sector`);
-        } else {
-          matchedCriteria.push(`Geographical eligibility met (${scheme.locationType})`);
-        }
-      }
-
-      // 6. Primary Occupation Category
-      if (scheme.targetOccupation) {
-        if (userProfile.occupation !== scheme.targetOccupation) {
-          matchPercentage -= 35;
-          missingDocuments.push(`Requires occupation profile: ${scheme.targetOccupation}`);
-        } else {
-          matchedCriteria.push(`Occupation matched: ${scheme.targetOccupation}`);
-        }
-      }
-
-      // 7. Social Security Check: Widow Status
-      if (scheme.requiresWidowed) {
-        if (userProfile.maritalStatus !== "Widowed") {
-          matchPercentage -= 45;
-          missingDocuments.push("Social status criteria mismatch (Requires: Widowed)");
-        } else {
-          matchedCriteria.push("Social status verified (Widowed)");
-        }
-      }
-
-      // 8. Person with Disability Status
-      if (scheme.requiresDifferentlyAbled) {
-        if (!userProfile.differentlyAbled) {
-          matchPercentage -= 50;
-          missingDocuments.push("Requires official Disability Certification (PwD)");
-        } else {
-          matchedCriteria.push("Disability criteria met");
-        }
-      }
-
-      // 9. Community/Caste Category Constraints
-      if (scheme.targetCommunity) {
-        const isMatched = scheme.targetCommunity.includes(userProfile.community);
-        if (!isMatched) {
-          matchPercentage -= 40;
-          missingDocuments.push(`Requires target community groups: [${scheme.targetCommunity.join(", ")}]`);
-        } else {
-          matchedCriteria.push(`Community caste group eligibility met (${userProfile.community})`);
-        }
-      }
-
-      // 10. Religion Minorities Constraints
-      if (scheme.targetReligion) {
-        const isMatched = scheme.targetReligion.includes(userProfile.religion);
-        if (!isMatched) {
-          matchPercentage -= 50;
-          missingDocuments.push(`Requires minority religion profile: [${scheme.targetReligion.join(", ")}]`);
-        } else {
-          matchedCriteria.push(`Minority religion criteria met (${userProfile.religion})`);
-        }
-      }
-
-      // 11. Overlap boosts
-      if (userProfile.occupation === "Student" && scheme.title.toLowerCase().includes("scholarship")) {
-        matchPercentage += 10;
-      }
-      if (userProfile.occupation === "Student" && scheme.title.toLowerCase().includes("skill")) {
-        matchPercentage += 5;
-      }
-      if (userProfile.occupation === "Farmer" && scheme.title.toLowerCase().includes("kisan")) {
-        matchPercentage += 10;
-      }
-
-      const finalPercentage = clampScore(matchPercentage);
-
-      // Collect specific document inputs if the scheme criteria have passed perfectly (0 missing documents)
-      // Otherwise, return missing documents showing failed criteria details
-      const actualMissing = finalPercentage === 100 ? [] : missingDocuments;
-
-      return {
-        id: scheme.id,
-        title: scheme.title,
-        department: scheme.department,
-        benefit: scheme.benefit,
-        matchPercentage: finalPercentage,
-        matchedCriteria: matchedCriteria.length > 0 ? matchedCriteria : ["General Citizen Criteria Verified"],
-        missingDocuments: actualMissing,
-        officialLink: scheme.officialLink,
-        requiredDocsList: scheme.requiredDocsList || ["Aadhaar Card", "Ration Card"]
-      };
-    });
-
-    // Filtering, sorting and slicing top 6 schemes
-    const filteredSchemes = calculatedSchemes
+    const results = SCHEMES_DB
+      .map((s) => score(s, user))
       .filter((s) => s.matchPercentage >= 40)
       .sort((a, b) => b.matchPercentage - a.matchPercentage)
       .slice(0, 6);
 
-    return NextResponse.json({ schemes: filteredSchemes });
-  } catch (error) {
-    return NextResponse.json({ error: "Failed to compile scheme results: " + error.message }, { status: 400 });
+    return NextResponse.json({ schemes: results });
+  } catch (err) {
+    return NextResponse.json(
+      { error: "Scheme computation failed: " + err.message },
+      { status: 400 }
+    );
   }
 }
