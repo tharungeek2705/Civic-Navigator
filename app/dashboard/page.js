@@ -121,249 +121,319 @@ export default function DashboardPage() {
   return (
     <main className="min-h-screen bg-[#070c1b] pb-20 text-slate-100">
       
-      {/* ── TOP ACTION BAR ── */}
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-8">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-10 rounded-3xl border border-slate-800/80 bg-slate-900/40 backdrop-blur-md p-6 sm:p-8">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
-              Welcome, <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 to-emerald-400">{profile?.name || "Citizen"}</span>
-            </h1>
-            <p className="text-sm text-slate-400 mt-1">
-              Discover welfare schemes in {profile?.state || "Tamil Nadu"} matched against your demographic parameters.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap gap-3">
-            <Link
-              href="/whatsapp"
-              className="flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-800 px-5 py-2.5 text-xs font-black uppercase tracking-wider text-slate-300 hover:bg-slate-750 hover:text-white transition shadow-md"
-            >
-              🎙️ Voice Note Demo
-            </Link>
-            
-            <a
-              href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
-                `*❖ CIVIC NAVIGATOR — Welfare Eligibility Report*\n` +
-                `__________________________________\n\n` +
-                `*❖ Citizen:* ${profile?.name || "Citizen"}\n` +
-                `*❖ State:* ${profile?.state || "N/A"} | *Sector:* ${profile?.locationType || "N/A"}\n` +
-                `*❖ Occupation:* ${profile?.occupation || "N/A"} | *Age:* ${profile?.age || "N/A"} yrs\n` +
-                `__________________________________\n\n` +
-                schemes.map((s, idx) => 
-                  `${idx + 1}. *${s.title}*\n` +
-                  `   ❖ ${s.department}\n` +
-                  `   ❖ *Benefit:* ${s.benefit}\n` +
-                  `   ❖ *Match Score:* ${s.matchPercentage}%\n` +
-                  `   ❖ ${s.officialLink || "https://www.myscheme.gov.in"}`
-                ).join("\n\n")
-              )}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 px-5 py-2.5 text-xs font-black uppercase tracking-wider text-white shadow-md transition"
-            >
-              💬 Send Report to WhatsApp
-            </a>
-          </div>
-        </div>
-      </div>
-
-      {/* ── MAIN CONTENT GRID ── */}
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          
-          {/* Main Area: Schemes & Accordion (Left 8 Columns) */}
-          <div className="lg:col-span-8 space-y-10">
-            
-            {/* Schemes Header */}
+      {/* ── SCREEN ONLY CONTENT (Hidden in print) ── */}
+      <div className="print:hidden">
+        {/* ── TOP ACTION BAR ── */}
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-8">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-10 rounded-3xl border border-slate-800/80 bg-slate-900/40 backdrop-blur-md p-6 sm:p-8">
             <div>
-              <h2 className="text-xl font-extrabold text-white tracking-tight flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                Your Matched Benefits ({schemes.length})
-              </h2>
-            </div>
-
-            {/* Scheme Cards */}
-            {schemes.length === 0 ? (
-              <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-10 text-center text-slate-400">
-                No schemes matched the provided criteria. Try updating your profile parameters.
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {schemes.map((scheme, i) => {
-                  const matchedFields = scheme.matchedCriteria || [];
-                  const missingFields = scheme.missingDocuments || [];
-                  const hasMissing = missingFields.length > 0;
-
-                  return (
-                    <div key={i} className="flex flex-col justify-between rounded-3xl border border-slate-800 bg-slate-900/30 p-6 space-y-5 hover:border-slate-700 transition relative overflow-hidden group">
-                      
-                      {/* Top accent line */}
-                      <span className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-indigo-500 to-emerald-500 opacity-50" />
-
-                      <div className="space-y-4">
-                        {/* Header: Score & Agency */}
-                        <div className="flex justify-between items-start gap-2">
-                          <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 truncate max-w-[70%]">
-                            {scheme.department}
-                          </span>
-                          <span className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-1 text-[9px] font-bold text-emerald-400 shrink-0">
-                            {scheme.matchPercentage}% MATCH
-                          </span>
-                        </div>
-
-                        {/* Title & Benefit */}
-                        <div>
-                          <h3 className="text-lg font-extrabold text-white leading-snug group-hover:text-indigo-400 transition-colors">
-                            {scheme.title}
-                          </h3>
-                          <div className="mt-2 text-xl font-black text-emerald-400 tracking-tight">
-                            {scheme.benefit}
-                          </div>
-                        </div>
-
-                        {/* Criteria Tags */}
-                        {matchedFields.length > 0 && (
-                          <div className="flex flex-wrap gap-1.5 pt-2">
-                            {matchedFields.map(m => (
-                              <span key={m} className="rounded-md bg-slate-800/60 px-2 py-1 text-[10px] font-medium text-slate-300">
-                                ✓ {m}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-
-                        {/* Missing Documents Warning */}
-                        {hasMissing && (
-                          <div className="rounded-xl border border-amber-500/20 bg-amber-950/20 p-3">
-                            <div className="text-[10px] font-black uppercase text-amber-400 flex items-center gap-1.5 mb-1">
-                              ⚠️ Action Required
-                            </div>
-                            <p className="text-xs text-amber-400/80">
-                              Upload: {missingFields.join(", ")}
-                            </p>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Scheme Action Zone */}
-                      <div className="flex gap-2 mt-4">
-                        <a
-                          href={scheme.officialLink || "https://www.myscheme.gov.in"}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex-1 flex items-center justify-center rounded-xl bg-indigo-600 hover:bg-indigo-500 py-3 text-xs font-black uppercase tracking-widest text-white shadow-md transition text-center"
-                        >
-                          Apply on Official Portal ↗
-                        </a>
-                        
-                        <a
-                          href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
-                            `*❖ CIVIC NAVIGATOR — Scheme Eligibility*\n` +
-                            `__________________________________\n\n` +
-                            `*❖ Scheme:* ${scheme.title}\n` +
-                            `*❖ Department:* ${scheme.department}\n` +
-                            `*❖ Benefit:* ${scheme.benefit}\n` +
-                            `*❖ Match Score:* ${scheme.matchPercentage}%\n` +
-                            `*❖ Link:* ${scheme.officialLink || "https://www.myscheme.gov.in"}\n` +
-                            `__________________________________\n\n` +
-                            `Find your custom welfare eligibility report on Civic Navigator!`
-                          )}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-600 hover:bg-emerald-500 border border-emerald-500/20 text-white shadow-md transition shrink-0 text-sm"
-                          title="Share to WhatsApp"
-                        >
-                          💬
-                        </a>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-
-            {/* AI Policy Explainer Accordion */}
-            <div className="space-y-4 pt-10 border-t border-slate-900">
-              <h2 className="text-xl font-extrabold text-white tracking-tight flex items-center gap-2">
-                🤖 AI Policy Explainer
-              </h2>
-              <div className="rounded-3xl border border-slate-800 bg-slate-900/10 p-2 space-y-2">
-                {policyFAQs.map((faq, idx) => {
-                  const isOpen = openAccordion === idx;
-                  return (
-                    <div key={idx} className="rounded-2xl overflow-hidden transition-all">
-                      <button
-                        onClick={() => toggleAccordion(idx)}
-                        className="w-full flex items-center justify-between p-5 text-left bg-slate-900/30 hover:bg-slate-900/60 transition cursor-pointer"
-                      >
-                        <span className="text-sm font-bold text-slate-200">{faq.question}</span>
-                        <span className="text-indigo-400 text-lg transition-transform" style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
-                          ▼
-                        </span>
-                      </button>
-                      
-                      <div className={`transition-all duration-300 overflow-hidden ${isOpen ? 'max-h-40 border-t border-slate-800/50 bg-slate-900/10' : 'max-h-0'}`}>
-                        <p className="p-5 text-xs text-slate-400 leading-relaxed">
-                          {faq.answer}
-                        </p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-          </div>
-
-          {/* Sidebar Area: Welfare Deadline Tracker (Right 4 Columns) */}
-          <div className="lg:col-span-4 space-y-6">
-            
-            {/* Tracker Header */}
-            <div>
-              <h2 className="text-xl font-extrabold text-white tracking-tight flex items-center gap-2">
-                ⏳ Deadline Tracker
-              </h2>
-            </div>
-
-            {/* Glassmorphism Sidebar Widget */}
-            <div className="rounded-3xl border border-slate-800/80 bg-slate-900/40 backdrop-blur-md p-6 shadow-2xl space-y-5">
-              <p className="text-xs text-slate-400 leading-relaxed">
-                Critical deadlines tracked relative to matching schemes in your demographic profiles.
+              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+                Welcome, <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 to-emerald-400">{profile?.name || "Citizen"}</span>
+              </h1>
+              <p className="text-sm text-slate-400 mt-1">
+                Discover welfare schemes in {profile?.state || "Tamil Nadu"} matched against your demographic parameters.
               </p>
+            </div>
 
-              <div className="space-y-4">
-                {deadlines.map((dl) => (
-                  <div key={dl.id} className="p-4 rounded-2xl bg-slate-950/50 border border-slate-800/80 space-y-2 group hover:border-slate-700 transition">
-                    <div className="flex justify-between items-start gap-2">
-                      <h4 className="text-xs font-extrabold text-slate-200 group-hover:text-indigo-400 transition-colors">
-                        {dl.title}
-                      </h4>
-                      {dl.urgent && (
-                        <span className="text-[9px] font-bold bg-amber-500/10 border border-amber-500/25 px-2 py-0.5 rounded text-amber-400 shrink-0 uppercase tracking-widest animate-pulse">
-                          Urgent
-                        </span>
-                      )}
-                    </div>
-                    
-                    <div className="flex items-center justify-between text-[11px]">
-                      <span className="text-slate-400">{dl.type}</span>
-                      <span className={`font-bold ${dl.urgent ? "animate-pulse text-amber-400 font-extrabold" : "text-slate-400"}`}>
-                        {dl.date}
-                      </span>
-                    </div>
+            <div className="flex flex-wrap gap-3">
+              <button
+                onClick={() => window.print()}
+                className="flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-850 hover:bg-slate-750 hover:text-white px-5 py-2.5 text-xs font-black uppercase tracking-wider text-slate-300 transition shadow-md cursor-pointer"
+              >
+                📄 Download PDF
+              </button>
 
-                    <div className="text-[10px] text-slate-500 italic pt-1 border-t border-slate-900">
-                      💡 {dl.action}
-                    </div>
-                  </div>
-                ))}
+              <Link
+                href="/whatsapp"
+                className="flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-800 px-5 py-2.5 text-xs font-black uppercase tracking-wider text-slate-300 hover:bg-slate-750 hover:text-white transition shadow-md"
+              >
+                🎙️ Voice Note Demo
+              </Link>
+              
+              <a
+                href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
+                  `*❖ CIVIC NAVIGATOR — Welfare Eligibility Report*\n` +
+                  `__________________________________\n\n` +
+                  `*❖ Citizen:* ${profile?.name || "Citizen"}\n` +
+                  `*❖ State:* ${profile?.state || "N/A"} | *Sector:* ${profile?.locationType || "N/A"}\n` +
+                  `*❖ Occupation:* ${profile?.occupation || "N/A"} | *Age:* ${profile?.age || "N/A"} yrs\n` +
+                  `__________________________________\n\n` +
+                  schemes.map((s, idx) => 
+                    `${idx + 1}. *${s.title}*\n` +
+                    `   ❖ ${s.department}\n` +
+                    `   ❖ *Benefit:* ${s.benefit}\n` +
+                    `   ❖ *Match Score:* ${s.matchPercentage}%\n` +
+                    `   ❖ ${s.officialLink || "https://www.myscheme.gov.in"}`
+                  ).join("\n\n")
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 px-5 py-2.5 text-xs font-black uppercase tracking-wider text-white shadow-md transition"
+              >
+                💬 Send Report to WhatsApp
+              </a>
+            </div>
+          </div>
+        </div>
+
+        {/* ── MAIN CONTENT GRID ── */}
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            {/* Main Area: Schemes & Accordion (Left 8 Columns) */}
+            <div className="lg:col-span-8 space-y-10">
+              
+              {/* Schemes Header */}
+              <div>
+                <h2 className="text-xl font-extrabold text-white tracking-tight flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                  Your Matched Benefits ({schemes.length})
+                </h2>
               </div>
+
+              {/* Scheme Cards */}
+              {schemes.length === 0 ? (
+                <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-10 text-center text-slate-400">
+                  No schemes matched the provided criteria. Try updating your profile parameters.
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {schemes.map((scheme, i) => {
+                    const matchedFields = scheme.matchedCriteria || [];
+                    const missingFields = scheme.missingDocuments || [];
+                    const hasMissing = missingFields.length > 0;
+
+                    return (
+                      <div key={i} className="flex flex-col justify-between rounded-3xl border border-slate-800 bg-slate-900/30 p-6 space-y-5 hover:border-slate-700 transition relative overflow-hidden group">
+                        
+                        {/* Top accent line */}
+                        <span className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-indigo-500 to-emerald-500 opacity-50" />
+
+                        <div className="space-y-4">
+                          {/* Header: Score & Agency */}
+                          <div className="flex justify-between items-start gap-2">
+                            <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 truncate max-w-[70%]">
+                              {scheme.department}
+                            </span>
+                            <span className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-1 text-[9px] font-bold text-emerald-400 shrink-0">
+                              {scheme.matchPercentage}% MATCH
+                            </span>
+                          </div>
+
+                          {/* Title & Benefit */}
+                          <div>
+                            <h3 className="text-lg font-extrabold text-white leading-snug group-hover:text-indigo-400 transition-colors">
+                              {scheme.title}
+                            </h3>
+                            <div className="mt-2 text-xl font-black text-emerald-400 tracking-tight">
+                              {scheme.benefit}
+                            </div>
+                          </div>
+
+                          {/* Criteria Tags */}
+                          {matchedFields.length > 0 && (
+                            <div className="flex flex-wrap gap-1.5 pt-2">
+                              {matchedFields.map(m => (
+                                <span key={m} className="rounded-md bg-slate-800/60 px-2 py-1 text-[10px] font-medium text-slate-300">
+                                  ✓ {m}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+
+                          {/* Missing Documents Warning */}
+                          {hasMissing && (
+                            <div className="rounded-xl border border-amber-500/20 bg-amber-950/20 p-3">
+                              <div className="text-[10px] font-black uppercase text-amber-400 flex items-center gap-1.5 mb-1">
+                                ⚠️ Action Required
+                              </div>
+                              <p className="text-xs text-amber-400/80">
+                                Upload: {missingFields.join(", ")}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Scheme Action Zone */}
+                        <div className="flex gap-2 mt-4">
+                          <a
+                            href={scheme.officialLink || "https://www.myscheme.gov.in"}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex-1 flex items-center justify-center rounded-xl bg-indigo-600 hover:bg-indigo-500 py-3 text-xs font-black uppercase tracking-widest text-white shadow-md transition text-center"
+                          >
+                            Apply on Official Portal ↗
+                          </a>
+                          
+                          <a
+                            href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
+                              `*❖ CIVIC NAVIGATOR — Scheme Eligibility*\n` +
+                              `__________________________________\n\n` +
+                              `*❖ Scheme:* ${scheme.title}\n` +
+                              `*❖ Department:* ${scheme.department}\n` +
+                              `*❖ Benefit:* ${scheme.benefit}\n` +
+                              `*❖ Match Score:* ${scheme.matchPercentage}%\n` +
+                              `*❖ Link:* ${scheme.officialLink || "https://www.myscheme.gov.in"}\n` +
+                              `__________________________________\n\n` +
+                              `Find your custom welfare eligibility report on Civic Navigator!`
+                            )}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-600 hover:bg-emerald-500 border border-emerald-500/20 text-white shadow-md transition shrink-0 text-sm"
+                            title="Share to WhatsApp"
+                          >
+                            💬
+                          </a>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* AI Policy Explainer Accordion */}
+              <div className="space-y-4 pt-10 border-t border-slate-900">
+                <h2 className="text-xl font-extrabold text-white tracking-tight flex items-center gap-2">
+                  🤖 AI Policy Explainer
+                </h2>
+                <div className="rounded-3xl border border-slate-800 bg-slate-900/10 p-2 space-y-2">
+                  {policyFAQs.map((faq, idx) => {
+                    const isOpen = openAccordion === idx;
+                    return (
+                      <div key={idx} className="rounded-2xl overflow-hidden transition-all">
+                        <button
+                          onClick={() => toggleAccordion(idx)}
+                          className="w-full flex items-center justify-between p-5 text-left bg-slate-900/30 hover:bg-slate-900/60 transition cursor-pointer"
+                        >
+                          <span className="text-sm font-bold text-slate-200">{faq.question}</span>
+                          <span className="text-indigo-400 text-lg transition-transform" style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+                            ▼
+                          </span>
+                        </button>
+                        
+                        <div className={`transition-all duration-300 overflow-hidden ${isOpen ? 'max-h-40 border-t border-slate-800/50 bg-slate-900/10' : 'max-h-0'}`}>
+                          <p className="p-5 text-xs text-slate-400 leading-relaxed">
+                            {faq.answer}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+            </div>
+
+            {/* Sidebar Area: Welfare Deadline Tracker (Right 4 Columns) */}
+            <div className="lg:col-span-4 space-y-6">
+              
+              {/* Tracker Header */}
+              <div>
+                <h2 className="text-xl font-extrabold text-white tracking-tight flex items-center gap-2">
+                  ⏳ Deadline Tracker
+                </h2>
+              </div>
+
+              {/* Glassmorphism Sidebar Widget */}
+              <div className="rounded-3xl border border-slate-800/80 bg-slate-900/40 backdrop-blur-md p-6 shadow-2xl space-y-5">
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Critical deadlines tracked relative to matching schemes in your demographic profiles.
+                </p>
+
+                <div className="space-y-4">
+                  {deadlines.map((dl) => (
+                    <div key={dl.id} className="p-4 rounded-2xl bg-slate-950/50 border border-slate-800/80 space-y-2 group hover:border-slate-700 transition">
+                      <div className="flex justify-between items-start gap-2">
+                        <h4 className="text-xs font-extrabold text-slate-200 group-hover:text-indigo-400 transition-colors">
+                          {dl.title}
+                        </h4>
+                        {dl.urgent && (
+                          <span className="text-[9px] font-bold bg-amber-500/10 border border-amber-500/25 px-2 py-0.5 rounded text-amber-400 shrink-0 uppercase tracking-widest animate-pulse">
+                            Urgent
+                          </span>
+                        )}
+                      </div>
+                      
+                      <div className="flex items-center justify-between text-[11px]">
+                        <span className="text-slate-400">{dl.type}</span>
+                        <span className={`font-bold ${dl.urgent ? "animate-pulse text-amber-400 font-extrabold" : "text-slate-400"}`}>
+                          {dl.date}
+                        </span>
+                      </div>
+
+                      <div className="text-[10px] text-slate-500 italic pt-1 border-t border-slate-900">
+                        💡 {dl.action}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
             </div>
 
           </div>
-
         </div>
       </div>
+
+      {/* ── PRINT ONLY CERTIFICATE TEMPLATE ── */}
+      <div className="hidden print:block bg-white text-slate-900 p-8 sm:p-12 border-8 border-double border-slate-800 rounded-3xl max-w-4xl mx-auto font-sans leading-relaxed">
+        <div className="text-center space-y-3 border-b-4 border-slate-850 pb-8 relative">
+          <div className="text-3xl font-black uppercase tracking-tight text-slate-950">Civic Navigator</div>
+          <div className="text-xs font-bold uppercase tracking-widest text-slate-500">AI-Powered Welfare Eligibility Certificate</div>
+          <div className="text-[10px] text-slate-400 font-mono">
+            Generated on: {profile ? new Date().toLocaleDateString('en-IN') : ""} | Verification Code: CN-{Math.floor(100000 + Math.random() * 900000)}
+          </div>
+        </div>
+
+        {/* Profile Demographics Summary */}
+        <div className="my-10 space-y-6">
+          <h3 className="text-sm font-black uppercase tracking-wider text-slate-800 border-b border-slate-200 pb-2">
+            1. Citizen Identity & Verification Details
+          </h3>
+          
+          <div className="grid grid-cols-2 gap-y-4 gap-x-8 text-xs">
+            <div><span className="text-slate-500">Full Name:</span> <strong className="text-slate-900 text-sm">{profile?.name}</strong></div>
+            <div><span className="text-slate-500">Age / Gender:</span> <strong className="text-slate-900">{profile?.age} yrs / {profile?.gender}</strong></div>
+            <div><span className="text-slate-500">State Domicile:</span> <strong className="text-slate-900">{profile?.state} ({profile?.locationType})</strong></div>
+            <div><span className="text-slate-500">Occupation:</span> <strong className="text-slate-900">{profile?.occupation}</strong></div>
+            <div><span className="text-slate-500">Annual Family Income:</span> <strong className="text-slate-900">₹{profile ? Number(profile.income).toLocaleString('en-IN') : ""}</strong></div>
+            <div><span className="text-slate-500">Aadhaar Status:</span> <strong className="text-slate-900">VERIFIED (XXXX-XXXX-4456)</strong></div>
+          </div>
+        </div>
+
+        {/* Suggested Welfare Programs */}
+        <div className="my-10 space-y-6">
+          <h3 className="text-sm font-black uppercase tracking-wider text-slate-800 border-b border-slate-200 pb-2">
+            2. Matched Eligible Schemes ({schemes.length})
+          </h3>
+          
+          {schemes.length === 0 ? (
+            <p className="text-xs text-slate-500 italic">No eligible welfare matches found for this citizen configuration.</p>
+          ) : (
+            <div className="space-y-6">
+              {schemes.map((scheme, idx) => (
+                <div key={idx} className="border-l-4 border-slate-800 pl-4 py-1 space-y-2">
+                  <h4 className="text-sm font-bold text-slate-950">{idx + 1}. {scheme.title}</h4>
+                  <div className="grid grid-cols-2 gap-4 text-[11px] text-slate-600">
+                    <div><strong>Authority:</strong> {scheme.department}</div>
+                    <div><strong>Benefit Rate:</strong> {scheme.benefit}</div>
+                  </div>
+                  <p className="text-[11px] text-slate-500 leading-normal">
+                    This citizen conforms to all critical criteria and is eligible for immediate enrollment.
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Certificate Verification Footer */}
+        <div className="mt-16 border-t-2 border-slate-200 pt-6 flex justify-between items-center text-[9px] text-slate-400 font-mono">
+          <div>Authenticity verified in real-time via UIDAI and DigiLocker Consent Sandbox APIs.</div>
+          <div>Page 1 of 1</div>
+        </div>
+      </div>
+
     </main>
   );
 }

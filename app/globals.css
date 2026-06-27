@@ -113,3 +113,13 @@ body {
   -moz-appearance: none !important;
   appearance: none !important;
 }
+
+/* 
+ * Print stylesheet adjustments to force high-fidelity light-mode document rendering
+ */
+@media print {
+  html, body, main {
+    background: white !important;
+    color: #0f172a !important;
+  }
+}
