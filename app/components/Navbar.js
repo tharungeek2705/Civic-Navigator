@@ -37,6 +37,12 @@ export default function Navbar() {
                 }`}>
                 Dashboard
               </Link>
+              <Link href="/explore"
+                className={`text-sm font-bold transition ${
+                  pathname === "/explore" ? "text-indigo-400" : "text-slate-400 hover:text-indigo-300"
+                }`}>
+                Explore All Schemes
+              </Link>
               <Link href="/vault"
                 className={`text-sm font-bold transition ${
                   pathname === "/vault" ? "text-emerald-400" : "text-slate-400 hover:text-emerald-300"
@@ -85,6 +91,13 @@ export default function Navbar() {
               pathname === "/dashboard" ? "bg-slate-800 text-white" : "text-slate-400 hover:bg-slate-800 hover:text-white"
             }`}>
             Dashboard
+          </Link>
+          <Link href="/explore"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className={`block rounded-md px-3 py-2 text-base font-bold ${
+              pathname === "/explore" ? "bg-slate-800 text-indigo-400" : "text-slate-400 hover:bg-slate-800 hover:text-indigo-300"
+            }`}>
+            Explore All Schemes
           </Link>
           <Link href="/vault"
             onClick={() => setIsMobileMenuOpen(false)}
