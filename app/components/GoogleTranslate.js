@@ -32,7 +32,7 @@ export default function GoogleTranslate() {
   }, []);
 
   return (
-    <div className="relative inline-flex items-center group">
+    <div className="relative inline-flex items-center group w-36 h-[38px] shrink-0">
       {/* Premium UI/UX Globe Icon positioned absolutely */}
       <span className="absolute left-3 z-10 pointer-events-none text-slate-400 group-hover:text-indigo-400 transition-colors duration-300">
         <svg className="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -40,11 +40,11 @@ export default function GoogleTranslate() {
         </svg>
       </span>
 
-      <div id="google_translate_element" className="min-h-[38px] flex items-center"></div>
+      <div id="google_translate_element" className="w-full h-full flex items-center"></div>
       
       {/* Skeleton fallback loader while Google API scripts execute */}
       {!isLoaded && (
-        <div className="absolute inset-0 flex items-center justify-between pl-10 pr-4 py-2 rounded-xl border border-slate-700 bg-slate-900/50 backdrop-blur-md text-sm font-semibold text-slate-400 pointer-events-none h-[38px] box-sizing-border-box">
+        <div className="absolute inset-0 flex items-center justify-between pl-10 pr-4 py-2 rounded-xl border border-slate-700 bg-slate-900/50 backdrop-blur-md text-sm font-semibold text-slate-400 pointer-events-none h-full w-full box-border">
           <span>Language...</span>
           <svg className="w-4 h-4 text-indigo-400 animate-pulse ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />

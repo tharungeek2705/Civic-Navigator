@@ -62,7 +62,8 @@ body {
   font-family: inherit !important;
   display: inline-flex !important;
   align-items: center !important;
-  gap: 0.5rem !important;
+  justify-content: space-between !important; /* Stretch content */
+  width: 100% !important; /* Force full width to prevent layout collapse */
   height: 38px !important;
   box-sizing: border-box !important;
 }
@@ -86,7 +87,7 @@ body {
 .goog-te-gadget-simple span, 
 .goog-te-gadget-simple a {
   color: #f8fafc !important; /* slate-50 */
-  font-size: 0.875rem !important;
+  font-size: 0.825rem !important; /* Slightly smaller for fitting */
   font-weight: 600 !important;
   text-decoration: none !important;
   border: none !important;
