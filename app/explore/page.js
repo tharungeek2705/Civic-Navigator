@@ -1,7 +1,7 @@
 "use client";
 import { useState, useMemo } from "react";
 
-// Robust database array of 20 premium Central and State schemes
+// Robust database array of 12 premium Central and State schemes
 const ALL_SCHEMES_DATABASE = [
   {
     title: "PM Kisan Samman Nidhi",
@@ -113,6 +113,53 @@ const ALL_SCHEMES_DATABASE = [
   }
 ];
 
+// The Realistic Database Generator Engine
+const INDIAN_STATES = ["Tamil Nadu", "Kerala", "Karnataka", "Andhra Pradesh", "Telangana", "Central Govt"];
+const DEPARTMENTS = {
+  "Education": ["Dept. of Higher Education", "Skill Development Mission", "Ministry of Human Resources"],
+  "Healthcare": ["National Health Mission", "Directorate of Health Services", "Dept. of Health & Family Welfare"],
+  "Agriculture": ["Dept. of Agriculture & Farmer Welfare", "Organic Farming Board", "Krishi Vikas Cell"],
+  "Housing": ["Housing Development Board", "Urban Infrastructure Dept", "Rural Housing Mission"],
+  "Business": ["Startup Mission", "MSME Development Directorate", "TAHDCO Bureau"],
+  "Other": ["Social Justice & Empowerment", "Department of Women & Child Development", "Minority Welfare Board"]
+};
+const BENEFICIARIES = ["Students", "Farmers", "Women", "Senior Citizens", "All Demographics"];
+
+const MASSIVE_DATABASE = Array.from({ length: 320 }).map((_, index) => {
+  // Cycle through baseline layouts smoothly
+  const base = ALL_SCHEMES_DATABASE[index % ALL_SCHEMES_DATABASE.length];
+  
+  // Create variations based on index positions
+  const state = INDIAN_STATES[index % INDIAN_STATES.length];
+  const category = base.category;
+  const deptList = DEPARTMENTS[category] || DEPARTMENTS["Other"];
+  const department = `${deptList[index % deptList.length].toUpperCase()}, ${state.toUpperCase()}`;
+  const beneficiary = BENEFICIARIES[index % BENEFICIARIES.length];
+  
+  // Generate realistic unique financial benefits dynamically
+  const dynamicAmount = 1000 + (index * 150) % 14000;
+  const benefitString = index % 3 === 0 
+    ? `₹${dynamicAmount.toLocaleString('en-IN')} / year` 
+    : index % 3 === 1 ? `₹${(500 + (index * 50) % 2500).toLocaleString('en-IN')} / month`
+    : `Up to ₹${(20000 + (index * 2000) % 200000).toLocaleString('en-IN')} subsidy`;
+
+  // Dynamic futuristic naming map
+  const prefixes = ["Mukhyamantri", "Pradhan Mantri", "State", "Integrated", "Digital", "Jan Kalyan"];
+  const suffixes = ["Yojana", "Scholarship", "Subsidy Initiative", "Vikas Mission", "Kalyan Scheme", "Assistance Project"];
+  
+  const uniqueTitle = index < 12 ? base.title : `${prefixes[index % prefixes.length]} ${base.title.split(' ').pop()} ${suffixes[(index + 3) % suffixes.length]}`;
+
+  return {
+    title: uniqueTitle,
+    department: state === "Central Govt" ? base.department : department,
+    type: state === "Central Govt" ? "Central Govt" : state,
+    benefit: benefitString,
+    category: category,
+    beneficiary: beneficiary,
+    description: `Comprehensive welfare initiative targeting eligible ${beneficiary.toLowerCase()} to provide optimized infrastructural support, structural financial provisions, and systemic resource allocations across the territory.`
+  };
+});
+
 export default function GlobalSchemeDirectory() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedState, setSelectedState] = useState("All Authorities");
@@ -121,18 +168,19 @@ export default function GlobalSchemeDirectory() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
 
-  // Real-time structural filtering & semantic searching logic
+  // Real-time structural filtering & semantic searching logic on MASSIVE_DATABASE
   const filteredSchemes = useMemo(() => {
-    return ALL_SCHEMES_DATABASE.filter((scheme) => {
+    return MASSIVE_DATABASE.filter((scheme) => {
       const matchesSearch = scheme.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
                             scheme.description.toLowerCase().includes(searchQuery.toLowerCase());
       
       const matchesState = selectedState === "All Authorities" || 
-                           (selectedState === "Central Govt" && scheme.type === "Central Govt") ||
-                           (selectedState === "Tamil Nadu" && scheme.type === "Tamil Nadu");
+                           scheme.type === selectedState;
 
       const matchesSector = selectedSector === "All Sectors" || scheme.category === selectedSector;
-      const matchesBeneficiary = selectedBeneficiary === "All Demographics" || scheme.beneficiary === selectedBeneficiary;
+      
+      const matchesBeneficiary = selectedBeneficiary === "All Demographics" || 
+                                 scheme.beneficiary === selectedBeneficiary;
 
       return matchesSearch && matchesState && matchesSector && matchesBeneficiary;
     });
@@ -183,43 +231,45 @@ export default function GlobalSchemeDirectory() {
             <div>
               <label className="block text-xs font-bold text-slate-400 uppercase mb-2 tracking-wide">State Domicile</label>
               <select 
-                className="w-full bg-[#0f172a] border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 outline-none focus:border-indigo-500"
+                className="w-full bg-[#0f172a] border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 outline-none focus:border-indigo-500 cursor-pointer"
                 value={selectedState}
                 onChange={(e) => { setSelectedState(e.target.value); setCurrentPage(1); }}
               >
-                <option>All Authorities</option>
-                <option>Central Govt</option>
-                <option>Tamil Nadu</option>
+                <option value="All Authorities">All Authorities</option>
+                {INDIAN_STATES.map(state => (
+                  <option key={state} value={state}>{state}</option>
+                ))}
               </select>
             </div>
 
             <div>
               <label className="block text-xs font-bold text-slate-400 uppercase mb-2 tracking-wide">Sector Category</label>
               <select 
-                className="w-full bg-[#0f172a] border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 outline-none focus:border-indigo-500"
+                className="w-full bg-[#0f172a] border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 outline-none focus:border-indigo-500 cursor-pointer"
                 value={selectedSector}
                 onChange={(e) => { setSelectedSector(e.target.value); setCurrentPage(1); }}
               >
-                <option>All Sectors</option>
-                <option>Education</option>
-                <option>Healthcare</option>
-                <option>Agriculture</option>
-                <option>Housing</option>
-                <option>Business</option>
+                <option value="All Sectors">All Sectors</option>
+                <option value="Education">Education</option>
+                <option value="Healthcare">Healthcare</option>
+                <option value="Agriculture">Agriculture</option>
+                <option value="Housing">Housing</option>
+                <option value="Business">Business</option>
+                <option value="Other">Other</option>
               </select>
             </div>
 
             <div>
               <label className="block text-xs font-bold text-slate-400 uppercase mb-2 tracking-wide">Beneficiary Type</label>
               <select 
-                className="w-full bg-[#0f172a] border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 outline-none focus:border-indigo-500"
+                className="w-full bg-[#0f172a] border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 outline-none focus:border-indigo-500 cursor-pointer"
                 value={selectedBeneficiary}
                 onChange={(e) => { setSelectedBeneficiary(e.target.value); setCurrentPage(1); }}
               >
-                <option>All Demographics</option>
-                <option>Students</option>
-                <option>Farmers</option>
-                <option>Women</option>
+                <option value="All Demographics">All Demographics</option>
+                {BENEFICIARIES.filter(b => b !== "All Demographics").map(beneficiary => (
+                  <option key={beneficiary} value={beneficiary}>{beneficiary}</option>
+                ))}
               </select>
             </div>
           </div>
@@ -227,32 +277,42 @@ export default function GlobalSchemeDirectory() {
 
         {/* Dynamic Grid Results */}
         <div className="lg:col-span-3 space-y-6">
-          <div className="text-xs font-bold tracking-wider text-slate-400 uppercase">
-            Showing {filteredSchemes.length} Results
+          <div className="text-xs font-bold tracking-wider text-slate-400 uppercase flex justify-between items-center">
+            <span>Showing {filteredSchemes.length} Results</span>
+            <span className="text-[10px] text-slate-500">Database Size: {MASSIVE_DATABASE.length} Simulated entries</span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {paginatedSchemes.map((scheme, index) => (
-              <div key={index} className="bg-[#0b1329]/40 border border-slate-800/80 rounded-2xl p-5 flex flex-col justify-between hover:border-slate-700 transition duration-300">
+              <div key={index} className="bg-[#0b1329]/40 border border-slate-800/80 rounded-2xl p-5 flex flex-col justify-between hover:border-slate-700 transition duration-300 relative group overflow-hidden">
+                <span className="absolute top-0 inset-x-0 h-0.5 bg-gradient-to-r from-indigo-500/40 to-emerald-500/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                
                 <div>
-                  <div className="flex justify-between items-start mb-3">
+                  <div className="flex justify-between items-start mb-3 gap-2">
                     <span className="text-[10px] font-bold text-slate-400 tracking-wide uppercase truncate max-w-[180px]">{scheme.department}</span>
-                    <span className={`text-[9px] font-extrabold px-2 py-0.5 rounded-full border tracking-wide uppercase ${scheme.type === 'Central Govt' ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'}`}>
+                    <span className={`text-[9px] font-extrabold px-2 py-0.5 rounded-full border tracking-wide uppercase shrink-0 ${scheme.type === 'Central Govt' ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'}`}>
                       {scheme.type}
                     </span>
                   </div>
-                  <h4 className="text-base font-bold text-white mb-2 tracking-tight">{scheme.title}</h4>
+                  <h4 className="text-base font-bold text-white mb-2 tracking-tight line-clamp-1">{scheme.title}</h4>
                   <p className="text-xs text-slate-400 leading-relaxed mb-4 line-clamp-2">{scheme.description}</p>
                 </div>
                 
                 <div>
-                  <div className="flex gap-2 mb-4">
+                  <div className="flex flex-wrap gap-2 mb-4">
                     <span className="text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-1 rounded-md">Benefit: {scheme.benefit}</span>
                     <span className="text-[10px] font-bold bg-slate-800 text-slate-400 px-2 py-1 rounded-md"># {scheme.category}</span>
+                    <span className="text-[10px] font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-2 py-1 rounded-md">🎯 {scheme.beneficiary}</span>
                   </div>
-                  <button className="w-full bg-[#111a36] hover:bg-[#162246] text-slate-200 text-xs font-bold py-2.5 rounded-xl border border-slate-800/80 transition flex items-center justify-center gap-1.5">
+                  
+                  <a 
+                    href="https://www.myscheme.gov.in"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full bg-[#111a36] hover:bg-[#162246] text-slate-200 text-xs font-bold py-2.5 rounded-xl border border-slate-800/80 transition flex items-center justify-center gap-1.5 cursor-pointer text-center"
+                  >
                     EXPLORE DETAILS <span className="text-[10px]">↗</span>
-                  </button>
+                  </a>
                 </div>
               </div>
             ))}
@@ -265,14 +325,14 @@ export default function GlobalSchemeDirectory() {
               <button 
                 onClick={() => setCurrentPage(p => Math.max(p - 1, 1))}
                 disabled={currentPage === 1}
-                className="px-3 py-1.5 rounded-lg bg-[#0f172a] border border-slate-800 hover:bg-slate-800 disabled:opacity-30 disabled:hover:bg-[#0f172a] text-slate-200 transition"
+                className="px-3 py-1.5 rounded-lg bg-[#0f172a] border border-slate-800 hover:bg-slate-800 disabled:opacity-30 disabled:hover:bg-[#0f172a] text-slate-200 transition cursor-pointer"
               >
                 ← Previous
               </button>
               <button 
                 onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))}
                 disabled={currentPage === totalPages}
-                className="px-3 py-1.5 rounded-lg bg-[#0f172a] border border-slate-800 hover:bg-slate-800 disabled:opacity-30 disabled:hover:bg-[#0f172a] text-slate-200 transition"
+                className="px-3 py-1.5 rounded-lg bg-[#0f172a] border border-slate-800 hover:bg-slate-800 disabled:opacity-30 disabled:hover:bg-[#0f172a] text-slate-200 transition cursor-pointer"
               >
                 Next →
               </button>
