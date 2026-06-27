@@ -2,8 +2,6 @@
 
 @theme {
   --font-sans: var(--font-outfit), sans-serif;
-  
-  /* Add custom fade in animation if needed */
   --animate-fade-in: fadeIn 0.3s ease-out;
 }
 
@@ -51,8 +49,52 @@ body {
 }
 
 /*
- * Futuristic Vernacular Combobox Styling
+ * Futuristic Google Translate SIMPLE Widget Styling
  */
+.goog-te-gadget-simple {
+  background-color: rgba(15, 23, 42, 0.7) !important; /* slate-900 */
+  backdrop-filter: blur(8px) !important;
+  border: 1px solid rgba(99, 102, 241, 0.4) !important; /* indigo-500 */
+  border-radius: 0.75rem !important; /* xl */
+  padding: 0.5rem 1rem 0.5rem 2.2rem !important; /* Extra left padding for custom icon */
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  font-family: inherit !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  height: 38px !important;
+  box-sizing: border-box !important;
+}
+
+.goog-te-gadget-simple:hover {
+  border-color: rgba(99, 102, 241, 0.8) !important; /* indigo-500 glow */
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.3) !important;
+}
+
+/* Hide the default Google Translate logo image inside the widget */
+.goog-te-gadget-simple img {
+  display: none !important;
+}
+
+/* Hide the ugly default borders and dividers */
+.goog-te-gadget-simple span[style*="border-left"] {
+  display: none !important;
+}
+
+/* Style the text link inside the simple widget */
+.goog-te-gadget-simple span, 
+.goog-te-gadget-simple a {
+  color: #f8fafc !important; /* slate-50 */
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
+  text-decoration: none !important;
+  border: none !important;
+  background: transparent !important;
+  vertical-align: middle !important;
+}
+
+/* Ensure language dropdown matches dark styles if fallback is used */
 .goog-te-combo {
   background-color: rgba(15, 23, 42, 0.7) !important; /* slate-900 */
   backdrop-filter: blur(8px) !important;
@@ -69,19 +111,4 @@ body {
   -webkit-appearance: none !important;
   -moz-appearance: none !important;
   appearance: none !important;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23818cf8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E") !important;
-  background-repeat: no-repeat !important;
-  background-position: right 0.75rem center !important;
-  background-size: 1rem 1rem !important;
-  padding-right: 2.5rem !important;
-}
-
-.goog-te-combo:hover, .goog-te-combo:focus {
-  border-color: rgba(99, 102, 241, 0.8) !important; /* indigo-500 glow */
-  box-shadow: 0 0 15px rgba(99, 102, 241, 0.3) !important;
-}
-
-.goog-te-combo option {
-  background-color: #0f172a !important; /* slate-900 */
-  color: #f8fafc !important;
 }
